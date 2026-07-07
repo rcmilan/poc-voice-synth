@@ -60,3 +60,8 @@ src/
 - For the most consistent voice selection, **Chrome** tends to expose the richest set of voices (including Google voices).
 - Talkify also offers **premium cloud / neural voices**, but those require an API key and are intentionally **out of scope** for this POC — only its free browser mode is used.
 - Audio playback requires a user gesture in most browsers; just click **Play**.
+
+### Alternativas
+- https://www.assemblyai.com
+- https://deepgram.com
+- https://elevenlabs.io
