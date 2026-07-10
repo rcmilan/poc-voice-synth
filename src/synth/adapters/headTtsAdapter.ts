@@ -34,13 +34,16 @@ export function createHeadTtsAdapter(): SynthAdapter {
       connecting = (async () => {
         const { HeadTTS } = await import('@met4citizen/headtts');
         const h = new HeadTTS({
-          endpoints: ['webgpu', 'wasm'],
+          // WASM only. Kokoro's ISTFT vocoder ops are unreliable on
+          // onnxruntime-web's WebGPU backend and produce static/buzz, so we pin
+          // to WASM (verified to produce clean speech) — same as the Kokoro.js
+          // adapter's device:'wasm'. Slower (~seconds/utterance) but correct.
+          endpoints: ['wasm'],
           languages: ['en-us'],
           workerModule: WORKER_MODULE,
           dictionaryURL: DICTIONARY_URL,
-          // HeadTTS defaults the WASM path to q4, whose Kokoro quantization
-          // produces static/buzz. Use q8 (what the Kokoro.js adapter uses);
-          // WebGPU already defaults to fp32.
+          // HeadTTS defaults dtypeWasm to q4, whose quantization buzzes; q8
+          // matches the Kokoro.js adapter and sounds clean.
           dtypeWasm: 'q8',
         });
         await h.connect();
