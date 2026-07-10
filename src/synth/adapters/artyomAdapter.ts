@@ -1,22 +1,28 @@
-import { getBrowserVoices } from '../browserVoices';
+import { getBrowserVoices, toVoiceOptions } from '../browserVoices';
 import type { SpeakRequest, SynthAdapter, SynthMeta, VoiceOption } from '../types';
 
 export const artyomMeta: SynthMeta = {
   id: 'artyom',
   name: 'Artyom.js',
   description:
-    'Older voice assistant wrapper. Selects voices by language and honors speed/volume (no pitch).',
+    'Older voice-assistant wrapper over Web Speech. Natively it picks a voice by language ' +
+    '(e.g. en-GB always maps to its hardcoded "UK English Male"), so this adapter overrides that ' +
+    'to honor the specific voice you select. Speed and volume only — no pitch.',
   repoUrl: 'https://github.com/sdkcarlos/artyom.js',
 };
 
 /**
- * artyom.js ships an untyped default-export constructor. It picks a voice by
- * language rather than a specific voiceURI, so this section presents a language
- * picker (supports.langAsVoice). Rate maps to `speed`; pitch is unsupported.
+ * artyom.js ships an untyped default-export constructor. Its internal
+ * getVoice(lang) maps a language code to a *fixed* voice from its own table,
+ * ignoring any specific choice — which made our old language picker show one
+ * voice while a different one spoke. We present the real browser voices and
+ * override getVoice so talk() uses exactly the selected SpeechSynthesisVoice
+ * (falling back to artyom's native pick only for "System default").
  */
 export function createArtyomAdapter(): SynthAdapter {
   let artyom: any = null;
   let active = false;
+  let origGetVoice: ((lang: string) => SpeechSynthesisVoice | undefined) | null = null;
 
   async function ensure() {
     if (artyom) return;
@@ -24,12 +30,13 @@ export function createArtyomAdapter(): SynthAdapter {
     const mod = (await import('artyom.js/build/artyom.js')) as any;
     const Artyom = mod.default?.default ?? mod.default ?? mod;
     artyom = new Artyom();
+    origGetVoice = artyom.getVoice.bind(artyom);
   }
 
   return {
     supports: {
-      voice: false,
-      langAsVoice: true,
+      voice: true,
+      langAsVoice: false,
       rate: true,
       pitch: false,
       volume: true,
@@ -42,26 +49,24 @@ export function createArtyomAdapter(): SynthAdapter {
 
     async getVoices(): Promise<VoiceOption[]> {
       await ensure();
-      // Offer the distinct languages available from the browser voice list.
       const voices = await getBrowserVoices();
-      const seen = new Map<string, string>();
-      for (const v of voices) {
-        if (!seen.has(v.lang)) seen.set(v.lang, v.name);
-      }
-      return [...seen.entries()].map(([lang, sample]) => ({
-        id: lang,
-        label: `${lang} (e.g. ${sample})`,
-        lang,
-      }));
+      return toVoiceOptions(voices);
     },
 
     async speak({ text, config }: SpeakRequest, onStart?: () => void) {
       await ensure();
+
+      const voice = config.voiceURI
+        ? speechSynthesis.getVoices().find((v) => v.voiceURI === config.voiceURI)
+        : undefined;
+      // Force artyom.talk() to use the chosen voice instead of its per-language default.
+      artyom.getVoice = (lang: string) => voice ?? origGetVoice?.(lang);
+
       // artyom reads voice/speed/volume from its global properties, so configure
       // it right before speaking. listen:false keeps speech recognition off.
       await artyom
         .initialize({
-          lang: config.lang || 'en-US',
+          lang: voice?.lang || config.lang || 'en-US',
           continuous: false,
           listen: false,
           debug: false,
