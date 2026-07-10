@@ -1,0 +1,9 @@
+# Native build scripts for Node-only deps pulled in transitively by kokoro-js /
+# @met4citizen/headtts. The browser build runs on WASM (onnxruntime-web), so
+# none of these native builds are needed. false = skip build, no warning, clean
+# exit (incl. CI `pnpm install --frozen-lockfile`).
+allowBuilds:
+  '@met4citizen/headtts': false
+  onnxruntime-node: false
+  protobufjs: false
+  sharp: false
