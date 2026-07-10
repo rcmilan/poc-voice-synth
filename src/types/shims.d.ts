@@ -3,3 +3,5 @@
 // both behind defensively-typed `any` adapters, so loose ambient shims are fine.
 declare module 'speak-tts';
 declare module 'artyom.js/build/artyom.js';
+// HeadTTS ships no type declarations; used behind a defensively-typed `any`.
+declare module '@met4citizen/headtts';

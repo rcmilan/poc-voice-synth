@@ -18,6 +18,8 @@ export interface SynthConfig {
   pitch: number;
   /** Volume. 0–1. */
   volume: number;
+  /** Tone tilt, -1 (darker) … 0 (flat) … 1 (brighter). Playback-layer effect. */
+  tone: number;
 }
 
 /** A selectable voice presented in a section's dropdown. */
@@ -60,6 +62,8 @@ export interface SynthAdapter {
     rate: boolean;
     pitch: boolean;
     volume: boolean;
+    /** Playback-layer effect — true only for engines that route through our Web Audio player. */
+    tone: boolean;
   };
 }
 

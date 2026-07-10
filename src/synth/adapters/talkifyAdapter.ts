@@ -6,8 +6,8 @@ export const talkifyMeta: SynthMeta = {
   id: 'talkify',
   name: 'Talkify',
   description:
-    'Talkify by Hagsten, running in its browser (Html5) mode on top of Web Speech — no API key. ' +
-    'Premium cloud neural voices exist but require a key and are out of scope here.',
+    "Web Speech in Talkify's free 'Html5' mode: OS voices, rate only (no pitch/volume). Its real " +
+    'draw is premium cloud neural voices, but those need an API key and are out of scope here.',
   repoUrl: 'https://github.com/Hagsten/Talkify',
 };
 
@@ -46,7 +46,14 @@ export function createTalkifyAdapter(): SynthAdapter {
   }
 
   return {
-    supports: { voice: true, langAsVoice: false, rate: true, pitch: false, volume: false },
+    supports: {
+      voice: true,
+      langAsVoice: false,
+      rate: true,
+      pitch: false,
+      volume: false,
+      tone: false,
+    },
 
     async load() {
       await ensure();
@@ -67,9 +74,7 @@ export function createTalkifyAdapter(): SynthAdapter {
           // forceVoice assigns this object straight to utterance.voice, so it
           // must be a real SpeechSynthesisVoice — a plain {name} produces
           // voice-unavailable and silence.
-          const voice = speechSynthesis
-            .getVoices()
-            .find((v) => v.voiceURI === config.voiceURI);
+          const voice = speechSynthesis.getVoices().find((v) => v.voiceURI === config.voiceURI);
           if (voice) player.forceVoice(voice);
         }
       } catch {

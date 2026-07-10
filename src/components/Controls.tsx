@@ -7,6 +7,7 @@ interface Supports {
   rate: boolean;
   pitch: boolean;
   volume: boolean;
+  tone: boolean;
 }
 
 interface ControlsProps {
@@ -99,6 +100,18 @@ export function Controls({
           step={0.05}
           disabled={disabled}
           onChange={(volume) => onChange({ volume })}
+        />
+      )}
+
+      {supports.tone && (
+        <Slider
+          label="Tone"
+          value={config.tone}
+          min={-1}
+          max={1}
+          step={0.1}
+          disabled={disabled}
+          onChange={(tone) => onChange({ tone })}
         />
       )}
     </div>

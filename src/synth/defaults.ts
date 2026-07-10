@@ -6,6 +6,7 @@ export const DEFAULT_CONFIG: SynthConfig = {
   rate: 1,
   pitch: 1,
   volume: 1,
+  tone: 0,
 };
 
 export const DEFAULT_TEXT = 'Hello! This is a comparison of browser voice synthesis libraries.';

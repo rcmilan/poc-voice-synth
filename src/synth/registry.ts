@@ -1,5 +1,7 @@
 import { createArtyomAdapter, artyomMeta } from './adapters/artyomAdapter';
 import { createEasySpeechAdapter, easySpeechMeta } from './adapters/easySpeechAdapter';
+import { createHeadTtsAdapter, headTtsMeta } from './adapters/headTtsAdapter';
+import { createKokoroAdapter, kokoroMeta } from './adapters/kokoroAdapter';
 import { createSpeakTtsAdapter, speakTtsMeta } from './adapters/speakTtsAdapter';
 import { createTalkifyAdapter, talkifyMeta } from './adapters/talkifyAdapter';
 import type { SynthAdapter, SynthMeta } from './types';
@@ -18,6 +20,8 @@ const VERSIONS: Record<string, string> = {
   'speak-tts': '2.0.8',
   artyom: '1.0.6',
   talkify: 'cdn (latest)',
+  kokoro: '1.2.1',
+  headtts: '1.3.0',
 };
 
 function withVersion(meta: SynthMeta): SynthMeta {
@@ -30,4 +34,6 @@ export const SYNTHS: SynthEntry[] = [
   { meta: withVersion(speakTtsMeta), createAdapter: createSpeakTtsAdapter },
   { meta: withVersion(artyomMeta), createAdapter: createArtyomAdapter },
   { meta: withVersion(talkifyMeta), createAdapter: createTalkifyAdapter },
+  { meta: withVersion(kokoroMeta), createAdapter: createKokoroAdapter },
+  { meta: withVersion(headTtsMeta), createAdapter: createHeadTtsAdapter },
 ];

@@ -2,3 +2,5 @@ dist
 node_modules
 pnpm-lock.yaml
 *.svg
+# Vendored third-party HeadTTS worker + dictionaries — not ours to format.
+public/headtts
